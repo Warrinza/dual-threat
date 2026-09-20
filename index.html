@@ -144,7 +144,11 @@ function appMain(state) {
   var OUTCOME_LABELS = {'win-dec':'Won · Decision (3)','win-maj':'Won · Major Dec. (4)','win-tech':'Won · Tech Fall (5)','win-pin':'Won · Fall (6)','win-ff':'Won · Forfeit (6)','loss':'Lost (0)','no-match':'No match (0)'};
   var OUTCOME_ORDER = ['win-dec','win-maj','win-tech','win-pin','win-ff','loss','no-match'];
   var MONTHS = {jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
-  var LOCAL_STATE_KEY = 'dualThreatState';
+  var GH_TOKEN_KEY = 'dualThreatGhToken';
+  var LEAGUE_JSON_URL = 'data/league.json';
+  var GH_REPO = 'Warrinza/dual-threat';
+  var GH_FILE_PATH = 'data/league.json';
+  var GH_BRANCH = 'main';
 
   function ownerById(s, id){ for (var i=0;i<s.owners.length;i++){ if (s.owners[i].id===id) return s.owners[i]; } return null; }
   function ownerStyle(o){ if(!o) return ''; return 'background:'+o.bg+';color:'+o.text+';border:1px solid '+o.border+';'; }
@@ -259,32 +263,42 @@ function appMain(state) {
     } catch(e){}
   }
 
-  function loadLocalState(){
+  function getGhToken(){
     try {
-      var raw = window.localStorage && localStorage.getItem(LOCAL_STATE_KEY);
-      if (!raw) return null;
-      var parsed = JSON.parse(raw);
-      if (!parsed || !parsed.owners || !parsed.schedule) return null;
-      return parsed;
-    } catch(e){ return null; }
+      var t = window.localStorage && localStorage.getItem(GH_TOKEN_KEY);
+      return t && String(t).trim() ? String(t).trim() : '';
+    } catch(e){ return ''; }
   }
-  function saveLocalState(s){
+  function setGhToken(token){
     try {
-      if (window.localStorage) localStorage.setItem(LOCAL_STATE_KEY, JSON.stringify(s));
+      if (!window.localStorage) return false;
+      if (token) localStorage.setItem(GH_TOKEN_KEY, token);
+      else localStorage.removeItem(GH_TOKEN_KEY);
       return true;
     } catch(e){ return false; }
+  }
+  function utf8ToBase64(str){
+    return btoa(unescape(encodeURIComponent(str)));
+  }
+  function refreshCanEdit(){
+    canEdit = !!getGhToken() || !!claudeCanEdit;
+  }
+  function applyState(next){
+    state = next;
+    thisWeek = detectCurrentWeek(state);
+    if (!state.owners.some(function(o){ return o.id===adminOwnerId; })) adminOwnerId = state.owners[0].id;
+    if (!state.schedule.some(function(w){ return w.week===adminWeek; })) adminWeek = state.schedule[0] ? state.schedule[0].week : 1;
+    if (!(rosterOwnerId==='all' || state.owners.some(function(o){ return o.id===rosterOwnerId; }))) rosterOwnerId = state.owners[0].id;
+    if (!state.schedule.some(function(w){ return w.week===viewWeek; })) viewWeek = thisWeek;
   }
 
   var root = document.getElementById('app');
   var prefs = loadUIPrefs();
-  var localSaved = loadLocalState();
-  if (localSaved) {
-    // Merge persisted local edits over the baked-in initial state when opened as a file
-    state = localSaved;
-  }
   var tab = (prefs && prefs.tab) || 'standings';
   var canEdit = false;
-  var usingLocalStorage = false;
+  var claudeCanEdit = false;
+  var saveMode = 'none'; // 'github' | 'claude' | 'none'
+  var loadNotice = null;
   var adminOwnerId = (prefs && prefs.adminOwnerId && state.owners.some(function(o){ return o.id===prefs.adminOwnerId; })) ? prefs.adminOwnerId : state.owners[0].id;
   var adminWeek = (prefs && prefs.adminWeek && state.schedule.some(function(w){ return w.week===prefs.adminWeek; })) ? prefs.adminWeek : 1;
   var thisWeek = detectCurrentWeek(state);
@@ -319,40 +333,61 @@ function appMain(state) {
     return '<!doctype html>\n<html>\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">\n<title>Dual Threat — Fantasy Wrestling League</title>\n<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap">\n</head>\n<body>\n<div id="app"></div>\n<script>(' + appMain.toString() + ')(' + json + ');<\/script>\n</body>\n</html>';
   }
 
+  async function saveToGitHub(newState, token){
+    var apiUrl = 'https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_FILE_PATH;
+    var headers = {
+      'Authorization': 'Bearer ' + token,
+      'Accept': 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28'
+    };
+    var getRes = await fetch(apiUrl + '?ref=' + encodeURIComponent(GH_BRANCH), { headers: headers });
+    if (!getRes.ok) {
+      var getErr = await getRes.json().catch(function(){ return {}; });
+      throw new Error(getErr.message || ('Could not read league.json (HTTP ' + getRes.status + ')'));
+    }
+    var meta = await getRes.json();
+    var body = JSON.stringify(newState, null, 2) + '\n';
+    var putRes = await fetch(apiUrl, {
+      method: 'PUT',
+      headers: Object.assign({ 'Content-Type': 'application/json' }, headers),
+      body: JSON.stringify({
+        message: 'Update league data',
+        content: utf8ToBase64(body),
+        sha: meta.sha,
+        branch: GH_BRANCH
+      })
+    });
+    if (!putRes.ok) {
+      var putErr = await putRes.json().catch(function(){ return {}; });
+      throw new Error(putErr.message || ('GitHub save failed (HTTP ' + putRes.status + ')'));
+    }
+  }
+
   async function publish(newState){
     if (saving) return;
     saving = true;
     render();
     try {
-      if (typeof claude !== 'undefined' && claude && typeof claude.use === 'function') {
+      var token = getGhToken();
+      if (token) {
+        await saveToGitHub(newState, token);
+        applyState(newState);
+        saveMode = 'github';
+        showToast('Saved — shared league data updated.');
+      } else if (typeof claude !== 'undefined' && claude && typeof claude.use === 'function') {
         var art = await claude.use('artifact');
         if (art) {
           var res = await art.publish(buildFullDocument(newState));
           if (res && res.ok === false){ showToast('Could not save — try again.'); }
-          else { state = newState; showToast('Saved.'); }
-          saving = false;
-          render();
-          return;
+          else { applyState(newState); saveMode = 'claude'; showToast('Saved.'); }
+        } else {
+          showToast('Add a GitHub token in Organizer to save shared data.');
         }
-      }
-      // Fallback: localStorage for local file / when Claude artifact API unavailable
-      if (saveLocalState(newState)) {
-        state = newState;
-        usingLocalStorage = true;
-        canEdit = true;
-        showToast('Saved locally (this browser).');
       } else {
-        showToast('Read-only view — changes are not saved.');
+        showToast('Add a GitHub token in Organizer to save shared data.');
       }
     } catch(e){
-      if (saveLocalState(newState)) {
-        state = newState;
-        usingLocalStorage = true;
-        canEdit = true;
-        showToast('Saved locally (this browser).');
-      } else {
-        showToast('Save failed: ' + (e && e.message ? e.message : 'unknown error'));
-      }
+      showToast('Save failed: ' + (e && e.message ? e.message : 'unknown error'));
     }
     saving = false;
     render();
@@ -370,7 +405,7 @@ function appMain(state) {
     var html = '';
     html += renderMasthead();
     html += '<div class="tabs" role="tablist" aria-label="League views">';
-    [['standings','Standings'],['matchups','Matchups'],['rosters','Rosters']].concat(canEdit? [['admin','Organizer']] : []).forEach(function(t){
+    [['standings','Standings'],['matchups','Matchups'],['rosters','Rosters'],['admin','Organizer']].forEach(function(t){
       html += '<button type="button" role="tab" class="tab-btn'+(tab===t[0]?' active':'')+'" data-tab="'+t[0]+'" aria-selected="'+(tab===t[0]?'true':'false')+'">'+ICONS[t[0]]+t[1]+'</button>';
     });
     html += '</div>';
@@ -378,9 +413,14 @@ function appMain(state) {
     else if (tab==='matchups') html += renderMatchups();
     else if (tab==='rosters') html += renderRosters();
     else if (tab==='admin') html += renderAdmin();
-    var saveNote = usingLocalStorage
-      ? 'Saves go to this browser’s localStorage when the Claude artifact API is unavailable.'
-      : 'Only the organizer can save changes; everyone else is viewing live results.';
+    if (loadNotice) {
+      html = '<div class="notice" style="margin-bottom:14px;" role="status">'+esc(loadNotice)+'</div>' + html;
+    }
+    var saveNote = saveMode === 'github'
+      ? 'Organizer saves update shared data/league.json on GitHub so everyone sees the same season.'
+      : (saveMode === 'claude'
+        ? 'Only the organizer can save changes; everyone else is viewing live results.'
+        : 'Everyone loads the same season from data/league.json. The organizer pastes a GitHub token to save.');
     html += '<footer class="note">Dual Threat · scoring: decision 3 · major decision 4 · tech fall 5 · fall/forfeit 6 · loss 0. '+saveNote+'</footer>';
     root.innerHTML = '<div class="wrap">'+html+'</div>';
     if (detailMatchup) {
@@ -565,11 +605,30 @@ function appMain(state) {
     }).join('');
   }
 
-  function renderAdmin(){
-    if (!canEdit){
-      return '<div class="card"><h2>Organizer</h2><div class="notice">You need edit access on this artifact to enter rosters, lineups, or results.</div></div>';
+  function renderAuthPanel(){
+    var hasToken = !!getGhToken();
+    var html = '<div class="admin-editor" style="border-top:none;padding-top:0;margin-top:0;"><h3 style="margin:0 0 10px;font-family:\'Big Shoulders Display\',sans-serif;text-transform:uppercase;">GitHub Access</h3>';
+    html += '<div class="notice" style="margin-bottom:14px;"><strong>Shared league saves</strong> create a fine-grained personal access token with <em>Contents: Read and write</em> on <code>Warrinza/dual-threat</code> only. Paste it below — it stays in this browser’s localStorage (<code>dualThreatGhToken</code>) and is never committed to the repo.</div>';
+    if (hasToken) {
+      html += '<p class="sub" style="margin-bottom:10px;">Token on file in this browser · saves go to <code>data/league.json</code> on <code>main</code>.</p>';
+      html += '<div style="display:flex;flex-wrap:wrap;gap:8px;"><button type="button" class="btn ghost" data-action="clear-gh-token">Clear token</button></div>';
+    } else {
+      html += '<div class="field"><label>Fine-grained PAT</label><input type="password" id="gh-token-input" placeholder="github_pat_…" autocomplete="off" spellcheck="false"></div>';
+      html += '<div style="display:flex;flex-wrap:wrap;gap:8px;"><button type="button" class="btn" data-action="save-gh-token">Save token in this browser</button></div>';
     }
-    var html = '<div class="card"><h2>Organizer Tools</h2><p class="sub">Enter draft rosters, set weekly lineups, and log official results'+(usingLocalStorage?' (saving to this browser)':'. Every save publishes a new version everyone sees')+'.</p>';
+    html += '</div>';
+    return html;
+  }
+
+  function renderAdmin(){
+    var html = '<div class="card"><h2>Organizer Tools</h2><p class="sub">'+(canEdit
+      ? 'Enter draft rosters, set weekly lineups, and log official results. Saves commit <code>data/league.json</code> so the whole league stays in sync.'
+      : 'Paste a GitHub fine-grained PAT below to unlock roster, lineup, and results editors.')+'</p>';
+    html += renderAuthPanel();
+    if (!canEdit){
+      html += '<div class="notice" style="margin-top:16px;">Editors unlock after a token is saved in this browser'+(claudeCanEdit?' (or when Claude artifact edit access is available)':'')+'.</div></div>';
+      return html;
+    }
 
     // Roster editor
     html += '<div class="admin-editor"><h3 style="margin:0 0 10px;font-family:\'Big Shoulders Display\',sans-serif;text-transform:uppercase;">Roster Builder</h3>';
@@ -681,6 +740,27 @@ function appMain(state) {
 
     var rosterFilter = root.querySelector('#roster-filter');
     if (rosterFilter) rosterFilter.addEventListener('change', function(){ rosterOwnerId = rosterFilter.value; saveUIPrefs(); render(); });
+
+    var saveTokenBtn = root.querySelector('[data-action="save-gh-token"]');
+    if (saveTokenBtn) saveTokenBtn.addEventListener('click', function(){
+      var input = root.querySelector('#gh-token-input');
+      var val = input ? String(input.value || '').trim() : '';
+      if (!val) { showToast('Paste a fine-grained PAT first.'); return; }
+      if (!setGhToken(val)) { showToast('Could not store token in this browser.'); return; }
+      refreshCanEdit();
+      saveMode = getGhToken() ? 'github' : saveMode;
+      showToast('Token saved in this browser only.');
+      render();
+    });
+    var clearTokenBtn = root.querySelector('[data-action="clear-gh-token"]');
+    if (clearTokenBtn) clearTokenBtn.addEventListener('click', function(){
+      setGhToken('');
+      refreshCanEdit();
+      if (!canEdit && tab === 'admin') { /* stay on admin for re-auth */ }
+      saveMode = getGhToken() ? 'github' : (claudeCanEdit ? 'claude' : 'none');
+      showToast('Token cleared from this browser.');
+      render();
+    });
 
     var rOwner = root.querySelector('#roster-owner');
     if (rOwner) rOwner.addEventListener('change', function(){ adminOwnerId = rOwner.value; saveUIPrefs(); render(); });
@@ -794,23 +874,33 @@ function appMain(state) {
   injectStyle();
   (async function(){
     try {
+      var res = await fetch(LEAGUE_JSON_URL + '?t=' + Date.now(), { cache: 'no-store' });
+      if (res.ok) {
+        var data = await res.json();
+        if (data && data.owners && data.schedule) {
+          applyState(data);
+        } else {
+          loadNotice = 'Shared league file looked incomplete — showing built-in defaults.';
+        }
+      } else {
+        loadNotice = 'Could not load shared league data (HTTP ' + res.status + ') — showing built-in defaults.';
+      }
+    } catch (e) {
+      loadNotice = 'Could not load shared league data — showing built-in defaults. Serve the repo folder (or GitHub Pages) so data/league.json is reachable.';
+    }
+
+    try {
       if (typeof claude !== 'undefined' && claude && typeof claude.use === 'function') {
         var userCap = await claude.use('user');
-        canEdit = userCap ? await userCap.canEdit() : false;
-        usingLocalStorage = false;
-      } else {
-        // Local file / no Claude: enable organizer via localStorage
-        canEdit = true;
-        usingLocalStorage = true;
+        claudeCanEdit = !!(userCap && await userCap.canEdit());
       }
-    } catch(e){
-      canEdit = true;
-      usingLocalStorage = true;
+    } catch (e) {
+      claudeCanEdit = false;
     }
-    if (tab === 'admin' && !canEdit){ tab = 'standings'; saveUIPrefs(); }
+    refreshCanEdit();
+    saveMode = getGhToken() ? 'github' : (claudeCanEdit ? 'claude' : 'none');
     render();
   })();
-  render();
 }
 
 var SEASON_OWNERS = [

@@ -1,0 +1,436 @@
+{
+  "seasonLabel": "2026–27 Season",
+  "owners": [
+    {
+      "id": "scott",
+      "name": "Scott",
+      "bg": "#f6d365",
+      "bg2": "#f9e7a1",
+      "text": "#2b1a00",
+      "border": "#c79412"
+    },
+    {
+      "id": "drew",
+      "name": "Drew",
+      "bg": "#ffb4a2",
+      "bg2": "#ffd0c6",
+      "text": "#3f140a",
+      "border": "#d16e58"
+    },
+    {
+      "id": "jake",
+      "name": "Jake",
+      "bg": "#9ad0f5",
+      "bg2": "#c0e6ff",
+      "text": "#08253b",
+      "border": "#4b8fc0"
+    },
+    {
+      "id": "carter",
+      "name": "Carter",
+      "bg": "#a9f0d1",
+      "bg2": "#c8f7e3",
+      "text": "#0a2a1c",
+      "border": "#4da980"
+    },
+    {
+      "id": "sam",
+      "name": "Sam",
+      "bg": "#d5b6ff",
+      "bg2": "#ead6ff",
+      "text": "#2b1146",
+      "border": "#8a63c2"
+    },
+    {
+      "id": "troy",
+      "name": "Troy",
+      "bg": "#ffc78f",
+      "bg2": "#ffdeb8",
+      "text": "#402000",
+      "border": "#d48b33"
+    },
+    {
+      "id": "pete",
+      "name": "Pete",
+      "bg": "#9ee8e0",
+      "bg2": "#c6f5f0",
+      "text": "#062d2a",
+      "border": "#39a8a0"
+    },
+    {
+      "id": "joel",
+      "name": "Joel",
+      "bg": "#cde97d",
+      "bg2": "#e1f2ad",
+      "text": "#223100",
+      "border": "#91ab2b"
+    },
+    {
+      "id": "dillon",
+      "name": "Dillon",
+      "bg": "#f7b2d0",
+      "bg2": "#ffd1e4",
+      "text": "#3b1023",
+      "border": "#c56896"
+    },
+    {
+      "id": "zach",
+      "name": "Zach",
+      "bg": "#b8c7ff",
+      "bg2": "#d6deff",
+      "text": "#1b2344",
+      "border": "#6f86d7"
+    },
+    {
+      "id": "jeremy",
+      "name": "Jeremy",
+      "bg": "#e9d7a5",
+      "bg2": "#f5ead1",
+      "text": "#352811",
+      "border": "#b89b4c"
+    },
+    {
+      "id": "andrew",
+      "name": "Andrew",
+      "bg": "#ffd6a5",
+      "bg2": "#ffe7c9",
+      "text": "#3a2100",
+      "border": "#d29a47"
+    }
+  ],
+  "schedule": [
+    {
+      "week": 1,
+      "label": "Nov 16–22",
+      "matchups": [
+        {
+          "a": "scott",
+          "b": "andrew"
+        },
+        {
+          "a": "drew",
+          "b": "jeremy"
+        },
+        {
+          "a": "jake",
+          "b": "zach"
+        },
+        {
+          "a": "carter",
+          "b": "dillon"
+        },
+        {
+          "a": "sam",
+          "b": "joel"
+        },
+        {
+          "a": "troy",
+          "b": "pete"
+        }
+      ]
+    },
+    {
+      "week": 2,
+      "label": "Nov 23–29",
+      "matchups": [
+        {
+          "a": "scott",
+          "b": "jeremy"
+        },
+        {
+          "a": "andrew",
+          "b": "zach"
+        },
+        {
+          "a": "drew",
+          "b": "dillon"
+        },
+        {
+          "a": "jake",
+          "b": "joel"
+        },
+        {
+          "a": "carter",
+          "b": "pete"
+        },
+        {
+          "a": "sam",
+          "b": "troy"
+        }
+      ]
+    },
+    {
+      "week": 3,
+      "label": "Nov 30–Dec 6",
+      "matchups": [
+        {
+          "a": "scott",
+          "b": "zach"
+        },
+        {
+          "a": "jeremy",
+          "b": "dillon"
+        },
+        {
+          "a": "andrew",
+          "b": "joel"
+        },
+        {
+          "a": "drew",
+          "b": "pete"
+        },
+        {
+          "a": "jake",
+          "b": "troy"
+        },
+        {
+          "a": "carter",
+          "b": "sam"
+        }
+      ]
+    },
+    {
+      "week": 4,
+      "label": "Dec 7–13",
+      "matchups": [
+        {
+          "a": "scott",
+          "b": "dillon"
+        },
+        {
+          "a": "zach",
+          "b": "joel"
+        },
+        {
+          "a": "jeremy",
+          "b": "pete"
+        },
+        {
+          "a": "andrew",
+          "b": "troy"
+        },
+        {
+          "a": "drew",
+          "b": "sam"
+        },
+        {
+          "a": "jake",
+          "b": "carter"
+        }
+      ]
+    },
+    {
+      "week": 5,
+      "label": "Dec 14–20",
+      "matchups": [
+        {
+          "a": "scott",
+          "b": "joel"
+        },
+        {
+          "a": "dillon",
+          "b": "pete"
+        },
+        {
+          "a": "zach",
+          "b": "troy"
+        },
+        {
+          "a": "jeremy",
+          "b": "sam"
+        },
+        {
+          "a": "andrew",
+          "b": "carter"
+        },
+        {
+          "a": "drew",
+          "b": "jake"
+        }
+      ]
+    },
+    {
+      "week": 6,
+      "label": "Dec 21–27",
+      "matchups": [
+        {
+          "a": "scott",
+          "b": "pete"
+        },
+        {
+          "a": "joel",
+          "b": "troy"
+        },
+        {
+          "a": "dillon",
+          "b": "sam"
+        },
+        {
+          "a": "zach",
+          "b": "carter"
+        },
+        {
+          "a": "jeremy",
+          "b": "jake"
+        },
+        {
+          "a": "andrew",
+          "b": "drew"
+        }
+      ]
+    },
+    {
+      "week": 7,
+      "label": "Dec 28–Jan 3",
+      "matchups": [
+        {
+          "a": "scott",
+          "b": "troy"
+        },
+        {
+          "a": "pete",
+          "b": "sam"
+        },
+        {
+          "a": "joel",
+          "b": "carter"
+        },
+        {
+          "a": "dillon",
+          "b": "jake"
+        },
+        {
+          "a": "zach",
+          "b": "drew"
+        },
+        {
+          "a": "jeremy",
+          "b": "andrew"
+        }
+      ]
+    },
+    {
+      "week": 8,
+      "label": "Jan 4–10",
+      "matchups": [
+        {
+          "a": "scott",
+          "b": "sam"
+        },
+        {
+          "a": "troy",
+          "b": "carter"
+        },
+        {
+          "a": "pete",
+          "b": "jake"
+        },
+        {
+          "a": "joel",
+          "b": "drew"
+        },
+        {
+          "a": "dillon",
+          "b": "andrew"
+        },
+        {
+          "a": "zach",
+          "b": "jeremy"
+        }
+      ]
+    },
+    {
+      "week": 9,
+      "label": "Jan 11–17",
+      "matchups": [
+        {
+          "a": "scott",
+          "b": "carter"
+        },
+        {
+          "a": "sam",
+          "b": "jake"
+        },
+        {
+          "a": "troy",
+          "b": "drew"
+        },
+        {
+          "a": "pete",
+          "b": "andrew"
+        },
+        {
+          "a": "joel",
+          "b": "jeremy"
+        },
+        {
+          "a": "dillon",
+          "b": "zach"
+        }
+      ]
+    },
+    {
+      "week": 10,
+      "label": "Jan 18–24",
+      "matchups": [
+        {
+          "a": "scott",
+          "b": "jake"
+        },
+        {
+          "a": "carter",
+          "b": "drew"
+        },
+        {
+          "a": "sam",
+          "b": "andrew"
+        },
+        {
+          "a": "troy",
+          "b": "jeremy"
+        },
+        {
+          "a": "pete",
+          "b": "zach"
+        },
+        {
+          "a": "joel",
+          "b": "dillon"
+        }
+      ]
+    },
+    {
+      "week": 11,
+      "label": "Jan 25–31",
+      "matchups": [
+        {
+          "a": "scott",
+          "b": "drew"
+        },
+        {
+          "a": "jake",
+          "b": "andrew"
+        },
+        {
+          "a": "carter",
+          "b": "jeremy"
+        },
+        {
+          "a": "sam",
+          "b": "zach"
+        },
+        {
+          "a": "troy",
+          "b": "dillon"
+        },
+        {
+          "a": "pete",
+          "b": "joel"
+        }
+      ]
+    }
+  ],
+  "wrestlers": [],
+  "lineups": {},
+  "results": {}
+}
