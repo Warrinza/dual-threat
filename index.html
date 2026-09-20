@@ -1,0 +1,857 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Dual Threat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap">
+<div id="app"><div style="min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:system-ui,sans-serif;color:#5c6470;">Loading Dual Threat…</div></div>
+<script>
+function appMain(state) {
+  'use strict';
+
+  var CSS_TEXT = [
+'@media (prefers-reduced-motion: reduce){*{animation-duration:.001ms!important;transition-duration:.001ms!important;}}',
+':root{',
+'  --ink:#16213a; --paper:#f2f4ef; --panel:#ffffff; --panel-2:#eceee7; --line:#dcdfd6;',
+'  --muted:#5c6470; --accent:#a97a12; --accent-ink:#2a1c00; --accent-2:#7a2331;',
+'  --win:#2f7a46; --loss:#b3432f; --tie:#8a6d1a; --shadow:0 10px 26px rgba(22,33,58,.08);',
+'  --masthead-a:#16213a; --masthead-b:#1e2b47; --masthead-text:#f4f1e6; --masthead-accent:#c9a227;',
+'}',
+'@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){',
+'  --ink:#eef1ea; --paper:#0f141d; --panel:#171f2b; --panel-2:#1d2634; --line:#2a3446;',
+'  --muted:#93a0b4; --accent:#e0b23c; --accent-ink:#241900; --accent-2:#e18a93;',
+'  --win:#58c47f; --loss:#ef8a73; --tie:#e0c264; --shadow:0 10px 26px rgba(0,0,0,.35);',
+'}}',
+':root[data-theme="dark"]{',
+'  --ink:#eef1ea; --paper:#0f141d; --panel:#171f2b; --panel-2:#1d2634; --line:#2a3446;',
+'  --muted:#93a0b4; --accent:#e0b23c; --accent-ink:#241900; --accent-2:#e18a93;',
+'  --win:#58c47f; --loss:#ef8a73; --tie:#e0c264; --shadow:0 10px 26px rgba(0,0,0,.35);',
+'}',
+'*{box-sizing:border-box;}',
+'body{margin:0;background:var(--paper);color:var(--ink);font-family:"Source Sans 3",system-ui,sans-serif;}',
+'h1,h2,h3{text-wrap:balance;}',
+'.wrap{max-width:1180px;margin:0 auto;padding-inline:18px;padding-block:20px 48px;}',
+'.masthead{background:linear-gradient(160deg,var(--masthead-a),var(--masthead-b) 70%);color:var(--masthead-text);border-radius:22px;padding:30px 28px;box-shadow:var(--shadow);position:relative;overflow:hidden;}',
+'.masthead::after{content:"";position:absolute;inset:0 0 auto 0;height:6px;background:linear-gradient(90deg,var(--masthead-accent),var(--accent-2));}',
+'.masthead-rings{position:absolute;top:50%;right:-70px;transform:translateY(-50%);width:280px;height:280px;pointer-events:none;opacity:.5;}',
+'.masthead-row{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-end;justify-content:space-between;position:relative;}',
+'.brand{font-family:"Big Shoulders Display",sans-serif;font-weight:800;font-size:clamp(2.1rem,5vw,3.2rem);letter-spacing:.01em;text-transform:uppercase;margin:0;line-height:.95;}',
+'.brand small{display:block;font-family:"Source Sans 3",sans-serif;font-weight:600;font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;color:var(--masthead-accent);margin-bottom:8px;}',
+'.masthead-meta{display:flex;flex-direction:column;align-items:flex-end;gap:8px;}',
+'.season-pill{font-family:"Space Mono",monospace;font-size:.78rem;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:7px 14px;white-space:nowrap;}',
+'.masthead-stats{display:flex;gap:16px;}',
+'.masthead-stat{text-align:right;}',
+'.masthead-stat b{display:block;font-family:"Space Mono",monospace;font-size:1.1rem;line-height:1.1;}',
+'.masthead-stat span{display:block;font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;opacity:.72;}',
+'.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0 22px;}',
+'.tab-btn{display:inline-flex;align-items:center;gap:7px;font-family:"Source Sans 3",sans-serif;font-weight:700;font-size:.85rem;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:999px;padding:9px 16px 9px 12px;cursor:pointer;transition:border-color .15s,background .15s;}',
+'.tab-btn svg{width:16px;height:16px;flex:none;}',
+'.tab-btn:hover{border-color:var(--accent);}',
+'.tab-btn:focus-visible,.week-btn:focus-visible,.btn:focus-visible,.matchup:focus-visible,.toggle-group button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}',
+'.tab-btn.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}',
+'.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:var(--shadow);margin-bottom:18px;}',
+'.card h2{font-family:"Big Shoulders Display",sans-serif;font-weight:700;font-size:1.5rem;text-transform:uppercase;letter-spacing:.02em;margin:0 0 4px;}',
+'.card .sub{color:var(--muted);font-size:.88rem;margin:0 0 18px;}',
+'.table-scroll{overflow-x:auto;}',
+'table{border-collapse:collapse;width:100%;min-width:560px;}',
+'th,td{text-align:left;padding:11px 10px;border-bottom:1px solid var(--line);font-size:.9rem;}',
+'th{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;}',
+'td.num,th.num{font-family:"Space Mono",monospace;font-variant-numeric:tabular-nums;text-align:right;}',
+'tbody tr:nth-child(even){background:var(--panel-2);}',
+'tbody tr.leader{box-shadow:inset 3px 0 0 var(--masthead-accent);}',
+'tr:last-child td{border-bottom:none;}',
+'.owner-chip{display:inline-flex;align-items:center;gap:9px;font-weight:700;font-size:.9rem;}',
+'.swatch{width:12px;height:12px;border-radius:4px;border:1px solid rgba(0,0,0,.15);display:inline-block;flex:none;}',
+'.avatar{width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-family:"Big Shoulders Display",sans-serif;font-weight:700;font-size:.8rem;flex:none;}',
+'.rank{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--panel-2);font-family:"Space Mono",monospace;font-size:.74rem;font-weight:700;margin-right:10px;}',
+'.rank.medal-1{background:#f0c05a;color:#402b00;}',
+'.rank.medal-2{background:#cdd3da;color:#2a2f36;}',
+'.rank.medal-3{background:#d9a066;color:#3a2000;}',
+'.week-picker{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px;}',
+'.week-btn{font-family:"Space Mono",monospace;font-size:.76rem;border:1px solid var(--line);background:var(--panel-2);color:var(--ink);border-radius:8px;padding:7px 10px;cursor:pointer;position:relative;}',
+'.week-btn.active{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);}',
+'.week-btn.this-week{box-shadow:inset 0 0 0 2px var(--accent-2);}',
+'.week-btn .this-week-cue{display:block;font-family:"Source Sans 3",sans-serif;font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-top:2px;opacity:.85;}',
+'.matchup-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;}',
+'.matchup{position:relative;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--panel);box-shadow:0 4px 14px rgba(22,33,58,.05);cursor:pointer;transition:border-color .15s,box-shadow .15s;width:100%;text-align:left;padding:0;font:inherit;color:inherit;}',
+'.matchup:hover{border-color:var(--accent);box-shadow:0 6px 18px rgba(22,33,58,.1);}',
+'.matchup-vs{display:flex;align-items:stretch;}',
+'.matchup-side{flex:1;display:flex;flex-direction:column;gap:6px;min-width:0;padding:16px 14px;}',
+'.matchup-side.right{align-items:flex-end;text-align:right;}',
+'.matchup-name{font-weight:700;font-size:.92rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}',
+'.matchup-score{font-family:"Space Mono",monospace;font-size:1.9rem;font-weight:700;line-height:1;}',
+'.matchup-vs-label{font-family:"Big Shoulders Display",sans-serif;font-weight:800;color:var(--muted);font-size:.78rem;padding:8px 0;flex:none;width:34px;display:flex;align-items:center;justify-content:center;background:var(--panel-2);}',
+'.matchup-hint{display:block;width:100%;text-align:center;font-size:.68rem;color:var(--muted);padding:4px 0 8px;border-top:1px solid var(--line);}',
+'.status-pill{display:block;width:100%;text-align:center;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;font-weight:700;padding:9px 0;border-top:1px solid var(--line);}',
+'.status-final{background:var(--win);color:var(--panel);}',
+'.status-pending{background:var(--panel-2);color:var(--muted);}',
+'.owner-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;}',
+'.owner-card{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--panel);box-shadow:0 4px 14px rgba(22,33,58,.05);}',
+'.owner-card-head{padding:12px 14px;display:flex;align-items:center;gap:10px;font-family:"Big Shoulders Display",sans-serif;font-weight:700;font-size:1.2rem;text-transform:uppercase;border-bottom:3px solid rgba(0,0,0,.12);}',
+'.roster-row{display:grid;grid-template-columns:48px 1fr 1fr;gap:8px;padding:8px 14px;font-size:.82rem;border-top:1px solid var(--line);align-items:center;}',
+'.roster-row:nth-child(even){background:var(--panel-2);}',
+'.wt-badge{font-family:"Space Mono",monospace;font-size:.72rem;color:var(--ink);background:var(--panel-2);border:1px solid var(--line);border-radius:999px;padding:3px 0;text-align:center;font-weight:700;}',
+'.roster-slot-label{font-size:.62rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);display:block;}',
+'.empty-slot{color:var(--muted);font-size:.78rem;}',
+'label{display:block;font-size:.76rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;}',
+'select,input[type=text]{font-family:"Source Sans 3",sans-serif;font-size:.9rem;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--ink);width:100%;}',
+'.field{margin-bottom:12px;}',
+'.field-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:14px;}',
+'.btn{font-family:"Source Sans 3",sans-serif;font-weight:700;font-size:.86rem;border:none;border-radius:10px;padding:10px 18px;cursor:pointer;background:var(--accent);color:var(--accent-ink);}',
+'.btn:hover{filter:brightness(1.05);}',
+'.btn:disabled{opacity:.55;cursor:not-allowed;}',
+'.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink);}',
+'.admin-editor{border-top:1px solid var(--line);padding-top:16px;margin-top:16px;}',
+'.admin-grid{display:grid;gap:8px;}',
+'.admin-wt-row{display:grid;grid-template-columns:56px 1fr 1fr;gap:8px;align-items:end;padding:8px 0;border-bottom:1px dashed var(--line);}',
+'.admin-wt-row .wt-label{font-family:"Space Mono",monospace;color:var(--muted);padding-bottom:8px;}',
+'.lineup-row{display:grid;grid-template-columns:56px 1fr auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--line);font-size:.86rem;}',
+'.lineup-row .wt-label{font-family:"Space Mono",monospace;color:var(--muted);}',
+'.toggle-group{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;}',
+'.toggle-group button{border:none;background:var(--panel);color:var(--ink);font-size:.78rem;font-weight:700;padding:6px 12px;cursor:pointer;}',
+'.toggle-group button.active{background:var(--accent);color:var(--accent-ink);}',
+'.result-row{display:grid;grid-template-columns:56px 1fr 1fr;gap:8px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--line);font-size:.85rem;}',
+'.result-row .who{color:var(--muted);}',
+'.matchup-result-row{display:grid;grid-template-columns:48px 1fr 120px 1fr 120px;gap:8px;align-items:center;padding:10px 0;border-bottom:1px dashed var(--line);font-size:.85rem;}',
+'.matchup-result-row .wt-label{font-family:"Space Mono",monospace;color:var(--muted);font-weight:700;}',
+'.cheat-sheet{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px;padding:12px;background:var(--panel-2);border-radius:10px;border:1px solid var(--line);}',
+'.cheat-sheet span{font-family:"Space Mono",monospace;font-size:.72rem;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--ink);}',
+'.notice{background:var(--panel-2);border:1px dashed var(--line);border-radius:12px;padding:14px;color:var(--muted);font-size:.88rem;}',
+'.notice strong{color:var(--ink);}',
+'.empty-state{text-align:center;padding:28px 18px;background:var(--panel-2);border:1px dashed var(--line);border-radius:14px;color:var(--muted);font-size:.92rem;line-height:1.55;}',
+'.empty-state strong{display:block;color:var(--ink);font-size:1rem;margin-bottom:6px;}',
+'.toast{position:fixed;bottom:calc(18px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 18px;border-radius:999px;font-size:.85rem;font-weight:700;box-shadow:var(--shadow);z-index:50;}',
+'footer.note{color:var(--muted);font-size:.8rem;margin-top:10px;line-height:1.5;}',
+'.modal-backdrop{position:fixed;inset:0;background:rgba(15,20,29,.55);z-index:100;display:flex;align-items:flex-end;justify-content:center;padding:16px;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px));}',
+'.modal{background:var(--panel);border:1px solid var(--line);border-radius:18px 18px 14px 14px;box-shadow:var(--shadow);width:min(720px,100%);max-height:min(88vh,900px);overflow:auto;padding:20px 20px 24px;}',
+'.modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px;}',
+'.modal-head h3{font-family:"Big Shoulders Display",sans-serif;font-weight:700;font-size:1.35rem;text-transform:uppercase;margin:0;}',
+'.modal-close{border:1px solid var(--line);background:var(--panel-2);color:var(--ink);border-radius:8px;width:36px;height:36px;font-size:1.2rem;cursor:pointer;flex:none;line-height:1;}',
+'.box-score{width:100%;min-width:0;}',
+'.box-score th,.box-score td{font-size:.84rem;padding:8px 6px;}',
+'.box-score .wt{font-family:"Space Mono",monospace;font-weight:700;width:48px;}',
+'.box-score .pts{font-family:"Space Mono",monospace;text-align:right;width:44px;}',
+'.box-score tfoot td{font-weight:700;border-top:2px solid var(--line);border-bottom:none;}',
+'.box-totals{display:flex;justify-content:space-between;gap:12px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line);}',
+'.box-total{flex:1;text-align:center;padding:10px;border-radius:10px;background:var(--panel-2);}',
+'.box-total b{display:block;font-family:"Space Mono",monospace;font-size:1.4rem;}',
+'.filter-bar{display:flex;flex-wrap:wrap;gap:12px;align-items:end;margin-bottom:16px;}',
+'.filter-bar .field{margin-bottom:0;min-width:180px;flex:1;}',
+'@media (min-width:700px){.modal-backdrop{align-items:center;}.modal{border-radius:18px;}}',
+'@media (max-width:640px){.roster-row,.admin-wt-row{grid-template-columns:36px 1fr;}.admin-wt-row .field:nth-child(3){grid-column:2;}.matchup-result-row{grid-template-columns:36px 1fr 1fr;gap:6px;}.matchup-result-row .side-b-name{grid-column:2;}.matchup-result-row .side-b-sel{grid-column:3;}.matchup-result-row .side-a-name{grid-column:2;}.matchup-result-row .side-a-sel{grid-column:3;}}'
+  ].join('\n');
+
+  var WEIGHTS = [125,133,141,149,157,165,174,184,197,285];
+  var POINTS = {'win-dec':3,'win-maj':4,'win-tech':5,'win-pin':6,'win-ff':6,'loss':0,'no-match':0};
+  var OUTCOME_LABELS = {'win-dec':'Won · Decision (3)','win-maj':'Won · Major Dec. (4)','win-tech':'Won · Tech Fall (5)','win-pin':'Won · Fall (6)','win-ff':'Won · Forfeit (6)','loss':'Lost (0)','no-match':'No match (0)'};
+  var OUTCOME_ORDER = ['win-dec','win-maj','win-tech','win-pin','win-ff','loss','no-match'];
+  var MONTHS = {jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
+  var LOCAL_STATE_KEY = 'dualThreatState';
+
+  function ownerById(s, id){ for (var i=0;i<s.owners.length;i++){ if (s.owners[i].id===id) return s.owners[i]; } return null; }
+  function ownerStyle(o){ if(!o) return ''; return 'background:'+o.bg+';color:'+o.text+';border:1px solid '+o.border+';'; }
+  function findWrestler(s, ownerId, weight, slot){
+    for (var i=0;i<s.wrestlers.length;i++){ var w=s.wrestlers[i]; if(w.ownerId===ownerId&&w.weight===weight&&w.slot===slot) return w; }
+    return null;
+  }
+  function activeSlot(s, week, ownerId, weight){
+    var lu = s.lineups[week+'_'+ownerId];
+    if (lu && lu[weight]) return lu[weight];
+    return 'starter';
+  }
+  function activeWrestler(s, week, ownerId, weight){
+    return findWrestler(s, ownerId, weight, activeSlot(s, week, ownerId, weight));
+  }
+  function resultFor(s, week, ownerId, weight){ return s.results[week+'_'+ownerId+'_'+weight] || null; }
+  function pointsFor(s, week, ownerId, weight){ var r=resultFor(s,week,ownerId,weight); return r? (POINTS[r.outcome]||0) : 0; }
+  function weekScore(s, week, ownerId){ var t=0; for(var i=0;i<WEIGHTS.length;i++){ t+=pointsFor(s,week,ownerId,WEIGHTS[i]); } return t; }
+  function weekHasResults(s, week, ownerId){
+    for (var i=0;i<WEIGHTS.length;i++){ if (resultFor(s,week,ownerId,WEIGHTS[i])) return true; }
+    return false;
+  }
+  function weekHasAnyResults(s, week){
+    var wk = s.schedule.filter(function(w){ return w.week===week; })[0];
+    if (!wk) return false;
+    return wk.matchups.some(function(m){ return weekHasResults(s, week, m.a) || weekHasResults(s, week, m.b); });
+  }
+  function computeStandings(s){
+    var table = {};
+    s.owners.forEach(function(o){ table[o.id] = {wins:0,losses:0,ties:0,pf:0,pa:0}; });
+    s.schedule.forEach(function(wk){
+      wk.matchups.forEach(function(m){
+        var played = weekHasResults(s, wk.week, m.a) || weekHasResults(s, wk.week, m.b);
+        var sa = weekScore(s, wk.week, m.a), sb = weekScore(s, wk.week, m.b);
+        table[m.a].pf += sa; table[m.a].pa += sb;
+        table[m.b].pf += sb; table[m.b].pa += sa;
+        if (played){
+          if (sa>sb){ table[m.a].wins++; table[m.b].losses++; }
+          else if (sb>sa){ table[m.b].wins++; table[m.a].losses++; }
+          else { table[m.a].ties++; table[m.b].ties++; }
+        }
+      });
+    });
+    return table;
+  }
+  function esc(str){ return String(str==null?'':str).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function initials(name){ return String(name||'?').trim().slice(0,1).toUpperCase(); }
+  function outcomeShort(outcome){
+    if (!outcome || outcome==='no-match') return '—';
+    var map = {'win-dec':'Dec','win-maj':'Maj','win-tech':'TF','win-pin':'Fall','win-ff':'FF','loss':'L'};
+    return map[outcome] || outcome;
+  }
+
+  function parseWeekRange(label, seasonStartYear){
+    // e.g. "Nov 16–22", "Nov 30–Dec 6", "Dec 28–Jan 3"
+    var m = String(label||'').match(/^([A-Za-z]+)\s+(\d+)\s*[–-]\s*(?:([A-Za-z]+)\s+)?(\d+)/);
+    if (!m) return null;
+    var m1 = MONTHS[m[1].toLowerCase().slice(0,3)];
+    var d1 = parseInt(m[2],10);
+    var m2name = m[3] || m[1];
+    var m2 = MONTHS[m2name.toLowerCase().slice(0,3)];
+    var d2 = parseInt(m[4],10);
+    if (m1==null || m2==null) return null;
+    var y1 = seasonStartYear;
+    if (m1 <= 6) y1 = seasonStartYear + 1; // Jan–Jun belong to next calendar year
+    var y2 = y1;
+    if (m2 < m1) y2 = y1 + 1; // crossed year boundary within the range
+    else if (m2 <= 6 && m1 > 6) y2 = seasonStartYear + 1;
+    return {start:new Date(y1, m1, d1), end:new Date(y2, m2, d2, 23, 59, 59)};
+  }
+
+  function seasonStartYearFromLabel(seasonLabel){
+    var m = String(seasonLabel||'').match(/(\d{4})/);
+    return m ? parseInt(m[1],10) : new Date().getFullYear();
+  }
+
+  function detectCurrentWeek(s){
+    var year = seasonStartYearFromLabel(s.seasonLabel);
+    var now = new Date();
+    var i, wk, range;
+    for (i=0;i<s.schedule.length;i++){
+      wk = s.schedule[i];
+      range = parseWeekRange(wk.label, year);
+      if (range && now >= range.start && now <= range.end) return wk.week;
+    }
+    for (i=0;i<s.schedule.length;i++){
+      if (!weekHasAnyResults(s, s.schedule[i].week)) return s.schedule[i].week;
+    }
+    return s.schedule.length ? s.schedule[0].week : 1;
+  }
+
+  var ICONS = {
+    standings:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="12" width="4" height="8" rx="1" fill="currentColor"/><rect x="10" y="7" width="4" height="13" rx="1" fill="currentColor"/><rect x="16" y="3" width="4" height="17" rx="1" fill="currentColor"/></svg>',
+    matchups:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l-6 7 6 7"/><path d="M15 5l6 7-6 7"/></svg>',
+    rosters:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="6" cy="6" r="2" fill="currentColor" stroke="none"/><line x1="11" y1="6" x2="20" y2="6"/><circle cx="6" cy="12" r="2" fill="currentColor" stroke="none"/><line x1="11" y1="12" x2="20" y2="12"/><circle cx="6" cy="18" r="2" fill="currentColor" stroke="none"/><line x1="11" y1="18" x2="20" y2="18"/></svg>',
+    admin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 3h6v3H9z" fill="currentColor" stroke="none"/><path d="M9 12l2 2 4-4"/></svg>'
+  };
+  var MASTHEAD_RINGS = '<svg class="masthead-rings" viewBox="0 0 200 200" aria-hidden="true"><circle cx="100" cy="100" r="94" fill="none" stroke="rgba(255,255,255,.14)" stroke-width="10"/><circle cx="100" cy="100" r="64" fill="none" stroke="rgba(255,255,255,.10)" stroke-width="8"/><circle cx="100" cy="100" r="34" fill="none" stroke="var(--masthead-accent)" stroke-opacity=".4" stroke-width="6"/></svg>';
+
+  function loadUIPrefs(){
+    try {
+      var raw = window.localStorage && localStorage.getItem('dualThreatUI');
+      return raw ? JSON.parse(raw) : null;
+    } catch(e){ return null; }
+  }
+  function saveUIPrefs(){
+    try {
+      if (window.localStorage) localStorage.setItem('dualThreatUI', JSON.stringify({
+        tab:tab, adminOwnerId:adminOwnerId, adminWeek:adminWeek, viewWeek:viewWeek,
+        rosterOwnerId:rosterOwnerId, adminMatchupIdx:adminMatchupIdx
+      }));
+    } catch(e){}
+  }
+
+  function loadLocalState(){
+    try {
+      var raw = window.localStorage && localStorage.getItem(LOCAL_STATE_KEY);
+      if (!raw) return null;
+      var parsed = JSON.parse(raw);
+      if (!parsed || !parsed.owners || !parsed.schedule) return null;
+      return parsed;
+    } catch(e){ return null; }
+  }
+  function saveLocalState(s){
+    try {
+      if (window.localStorage) localStorage.setItem(LOCAL_STATE_KEY, JSON.stringify(s));
+      return true;
+    } catch(e){ return false; }
+  }
+
+  var root = document.getElementById('app');
+  var prefs = loadUIPrefs();
+  var localSaved = loadLocalState();
+  if (localSaved) {
+    // Merge persisted local edits over the baked-in initial state when opened as a file
+    state = localSaved;
+  }
+  var tab = (prefs && prefs.tab) || 'standings';
+  var canEdit = false;
+  var usingLocalStorage = false;
+  var adminOwnerId = (prefs && prefs.adminOwnerId && state.owners.some(function(o){ return o.id===prefs.adminOwnerId; })) ? prefs.adminOwnerId : state.owners[0].id;
+  var adminWeek = (prefs && prefs.adminWeek && state.schedule.some(function(w){ return w.week===prefs.adminWeek; })) ? prefs.adminWeek : 1;
+  var thisWeek = detectCurrentWeek(state);
+  var viewWeek = (prefs && prefs.viewWeek && state.schedule.some(function(w){ return w.week===prefs.viewWeek; })) ? prefs.viewWeek : thisWeek;
+  var rosterOwnerId = (prefs && prefs.rosterOwnerId && (prefs.rosterOwnerId==='all' || state.owners.some(function(o){ return o.id===prefs.rosterOwnerId; }))) ? prefs.rosterOwnerId : state.owners[0].id;
+  var adminMatchupIdx = (prefs && typeof prefs.adminMatchupIdx === 'number') ? prefs.adminMatchupIdx : 0;
+  var detailMatchup = null; // {week, a, b}
+  var saving = false;
+
+  function injectStyle(){
+    var existing = document.getElementById('dt-style');
+    if (existing) existing.remove();
+    var st = document.createElement('style');
+    st.id = 'dt-style';
+    st.textContent = CSS_TEXT;
+    document.head.appendChild(st);
+  }
+
+  function showToast(msg){
+    var existing = document.querySelector('.toast');
+    if (existing) existing.remove();
+    var t = document.createElement('div');
+    t.className = 'toast';
+    t.setAttribute('role','status');
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(function(){ t.remove(); }, 2600);
+  }
+
+  function buildFullDocument(s){
+    var json = JSON.stringify(s).replace(/<\/script/gi, '<\\/script');
+    return '<!doctype html>\n<html>\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">\n<title>Dual Threat — Fantasy Wrestling League</title>\n<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap">\n</head>\n<body>\n<div id="app"></div>\n<script>(' + appMain.toString() + ')(' + json + ');<\/script>\n</body>\n</html>';
+  }
+
+  async function publish(newState){
+    if (saving) return;
+    saving = true;
+    render();
+    try {
+      if (typeof claude !== 'undefined' && claude && typeof claude.use === 'function') {
+        var art = await claude.use('artifact');
+        if (art) {
+          var res = await art.publish(buildFullDocument(newState));
+          if (res && res.ok === false){ showToast('Could not save — try again.'); }
+          else { state = newState; showToast('Saved.'); }
+          saving = false;
+          render();
+          return;
+        }
+      }
+      // Fallback: localStorage for local file / when Claude artifact API unavailable
+      if (saveLocalState(newState)) {
+        state = newState;
+        usingLocalStorage = true;
+        canEdit = true;
+        showToast('Saved locally (this browser).');
+      } else {
+        showToast('Read-only view — changes are not saved.');
+      }
+    } catch(e){
+      if (saveLocalState(newState)) {
+        state = newState;
+        usingLocalStorage = true;
+        canEdit = true;
+        showToast('Saved locally (this browser).');
+      } else {
+        showToast('Save failed: ' + (e && e.message ? e.message : 'unknown error'));
+      }
+    }
+    saving = false;
+    render();
+  }
+
+  function cloneState(){ return JSON.parse(JSON.stringify(state)); }
+
+  function closeDetail(){
+    detailMatchup = null;
+    render();
+  }
+
+  // ---------- render ----------
+  function render(){
+    var html = '';
+    html += renderMasthead();
+    html += '<div class="tabs" role="tablist" aria-label="League views">';
+    [['standings','Standings'],['matchups','Matchups'],['rosters','Rosters']].concat(canEdit? [['admin','Organizer']] : []).forEach(function(t){
+      html += '<button type="button" role="tab" class="tab-btn'+(tab===t[0]?' active':'')+'" data-tab="'+t[0]+'" aria-selected="'+(tab===t[0]?'true':'false')+'">'+ICONS[t[0]]+t[1]+'</button>';
+    });
+    html += '</div>';
+    if (tab==='standings') html += renderStandings();
+    else if (tab==='matchups') html += renderMatchups();
+    else if (tab==='rosters') html += renderRosters();
+    else if (tab==='admin') html += renderAdmin();
+    var saveNote = usingLocalStorage
+      ? 'Saves go to this browser’s localStorage when the Claude artifact API is unavailable.'
+      : 'Only the organizer can save changes; everyone else is viewing live results.';
+    html += '<footer class="note">Dual Threat · scoring: decision 3 · major decision 4 · tech fall 5 · fall/forfeit 6 · loss 0. '+saveNote+'</footer>';
+    root.innerHTML = '<div class="wrap">'+html+'</div>';
+    if (detailMatchup) {
+      var modalHost = document.createElement('div');
+      modalHost.innerHTML = renderMatchupDetail(detailMatchup);
+      root.appendChild(modalHost.firstChild);
+    }
+    wireEvents();
+  }
+
+  function renderMasthead(){
+    var weeksPlayed = state.schedule.filter(function(wk){
+      return wk.matchups.some(function(m){ return weekHasResults(state, wk.week, m.a) || weekHasResults(state, wk.week, m.b); });
+    }).length;
+    return '<div class="masthead">'+MASTHEAD_RINGS+'<div class="masthead-row">'+
+      '<h1 class="brand"><small>NCAA Wrestling Fantasy League</small>Dual Threat</h1>'+
+      '<div class="masthead-meta">'+
+        '<span class="season-pill">'+esc(state.seasonLabel)+'</span>'+
+        '<div class="masthead-stats">'+
+          '<div class="masthead-stat"><b>'+state.wrestlers.length+'</b><span>Drafted</span></div>'+
+          '<div class="masthead-stat"><b>'+weeksPlayed+' / '+state.schedule.length+'</b><span>Weeks Played</span></div>'+
+        '</div>'+
+      '</div>'+
+      '</div></div>';
+  }
+
+  function renderStandings(){
+    var drafted = state.wrestlers.length > 0;
+    var anyResults = Object.keys(state.results).length > 0;
+    var table = computeStandings(state);
+    var rows = state.owners.slice().sort(function(a,b){
+      var ta=table[a.id], tb=table[b.id];
+      if (tb.wins!==ta.wins) return tb.wins-ta.wins;
+      if (ta.losses!==tb.losses) return ta.losses-tb.losses;
+      return (tb.pf-tb.pa)-(ta.pf-ta.pa);
+    });
+    var html = '<div class="card"><h2>Standings</h2><p class="sub">Ranked by head-to-head record, then point differential.</p>';
+    if (!drafted) {
+      html += '<div class="empty-state"><strong>No wrestlers drafted yet</strong>Standings will appear after the organizer enters rosters and weekly results. Open <em>Organizer</em> to build rosters, or check <em>Matchups</em> once the season starts.</div></div>';
+      return html;
+    }
+    if (!anyResults) {
+      html += '<div class="empty-state" style="margin-bottom:16px;"><strong>Season not underway</strong>Rosters are in, but no results have been logged. Records stay 0–0 until matchups are scored.</div>';
+    }
+    html += '<div class="table-scroll"><table><thead><tr><th>Owner</th><th class="num">W</th><th class="num">L</th><th class="num">T</th><th class="num">PF</th><th class="num">PA</th><th class="num">Diff</th></tr></thead><tbody>';
+    var anyDecided = rows.some(function(o){ var t=table[o.id]; return t.wins||t.losses||t.ties; });
+    rows.forEach(function(o,i){
+      var t = table[o.id];
+      var diff = t.pf-t.pa;
+      var medalClass = i===0?' medal-1':i===1?' medal-2':i===2?' medal-3':'';
+      var leaderRow = (i===0 && anyDecided) ? ' leader' : '';
+      html += '<tr class="'+leaderRow+'"><td><span class="rank'+medalClass+'">'+(i+1)+'</span><span class="owner-chip"><span class="avatar" style="'+ownerStyle(o)+'">'+esc(initials(o.name))+'</span>'+esc(o.name)+'</span></td>'+
+        '<td class="num">'+t.wins+'</td><td class="num">'+t.losses+'</td><td class="num">'+t.ties+'</td>'+
+        '<td class="num">'+t.pf.toFixed(0)+'</td><td class="num">'+t.pa.toFixed(0)+'</td>'+
+        '<td class="num">'+(diff>0?'+':'')+diff.toFixed(0)+'</td></tr>';
+    });
+    html += '</tbody></table></div></div>';
+    return html;
+  }
+
+  function renderWeekPicker(activeWeek, dataAttr){
+    var html = '<div class="week-picker" role="group" aria-label="Select week">';
+    state.schedule.forEach(function(wk){
+      var isThis = wk.week === thisWeek;
+      var isActive = wk.week === activeWeek;
+      html += '<button type="button" class="week-btn'+(isActive?' active':'')+(isThis?' this-week':'')+'" '+dataAttr+'="'+wk.week+'" aria-pressed="'+(isActive?'true':'false')+'"'+(isThis?' title="This week"':'')+'>Wk '+wk.week+(isThis?'<span class="this-week-cue">This week</span>':'')+'</button>';
+    });
+    html += '</div>';
+    return html;
+  }
+
+  function renderMatchups(){
+    var html = '<div class="card"><h2>Weekly Matchups</h2><p class="sub">Round robin — every owner faces each other once over the season. Click a matchup for the box score.</p>';
+    html += renderWeekPicker(viewWeek, 'data-week-view');
+    var wk = state.schedule.filter(function(w){return w.week===viewWeek;})[0] || state.schedule[0];
+    html += '<p class="sub" style="margin-bottom:12px;">'+esc(wk.label)+(wk.week===thisWeek?' · <strong style="color:var(--ink)">This week</strong>':'')+'</p>';
+
+    if (state.wrestlers.length === 0) {
+      html += '<div class="empty-state"><strong>No lineups yet</strong>Matchups are scheduled, but rosters haven’t been drafted. Scores will show once wrestlers are entered and results logged.</div></div>';
+      return html;
+    }
+
+    var anyPlayedThisWeek = wk.matchups.some(function(m){ return weekHasResults(state, wk.week, m.a) || weekHasResults(state, wk.week, m.b); });
+    if (!anyPlayedThisWeek) {
+      html += '<div class="notice" style="margin-bottom:14px;">No results logged for this week yet — scores stay at 0 until the organizer enters outcomes. Tap any card for the weight-by-weight view.</div>';
+    }
+
+    html += '<div class="matchup-grid">';
+    wk.matchups.forEach(function(m){
+      var oa = ownerById(state,m.a), ob = ownerById(state,m.b);
+      var sa = weekScore(state, wk.week, m.a), sb = weekScore(state, wk.week, m.b);
+      var played = weekHasResults(state, wk.week, m.a) || weekHasResults(state, wk.week, m.b);
+      var status = !played ? '<span class="status-pill status-pending">Not Yet Played</span>' : '<span class="status-pill status-final">Final</span>';
+      var aTint = 'background:linear-gradient(180deg,'+oa.bg2+'55,transparent 70%);';
+      var bTint = 'background:linear-gradient(180deg,'+ob.bg2+'55,transparent 70%);';
+      html += '<button type="button" class="matchup" data-open-matchup="'+wk.week+'" data-a="'+m.a+'" data-b="'+m.b+'" aria-label="Open box score: '+esc(oa.name)+' vs '+esc(ob.name)+'">'+
+        '<div class="matchup-vs">'+
+        '<div class="matchup-side" style="'+aTint+'"><span class="owner-chip"><span class="avatar" style="'+ownerStyle(oa)+'">'+esc(initials(oa.name))+'</span>'+esc(oa.name)+'</span><span class="matchup-score" style="color:'+(sa>sb&&played?oa.border:'inherit')+';">'+sa.toFixed(0)+'</span></div>'+
+        '<div class="matchup-vs-label">VS</div>'+
+        '<div class="matchup-side right" style="'+bTint+'"><span class="owner-chip">'+esc(ob.name)+'<span class="avatar" style="'+ownerStyle(ob)+'">'+esc(initials(ob.name))+'</span></span><span class="matchup-score" style="color:'+(sb>sa&&played?ob.border:'inherit')+';">'+sb.toFixed(0)+'</span></div>'+
+        '</div>'+status+'<span class="matchup-hint">View box score</span></button>';
+    });
+    html += '</div></div>';
+    return html;
+  }
+
+  function renderMatchupDetail(dm){
+    var wk = state.schedule.filter(function(w){ return w.week===dm.week; })[0];
+    var oa = ownerById(state, dm.a), ob = ownerById(state, dm.b);
+    var sa = weekScore(state, dm.week, dm.a), sb = weekScore(state, dm.week, dm.b);
+    var played = weekHasResults(state, dm.week, dm.a) || weekHasResults(state, dm.week, dm.b);
+    var html = '<div class="modal-backdrop" data-modal-backdrop role="presentation">';
+    html += '<div class="modal" role="dialog" aria-modal="true" aria-labelledby="box-score-title">';
+    html += '<div class="modal-head"><div><h3 id="box-score-title">'+esc(oa.name)+' vs '+esc(ob.name)+'</h3>';
+    html += '<p class="sub" style="margin:4px 0 0;">Week '+dm.week+' · '+esc(wk ? wk.label : '')+(played?' · Final':' · Pending')+'</p></div>';
+    html += '<button type="button" class="modal-close" data-close-modal aria-label="Close">&times;</button></div>';
+
+    html += '<div class="table-scroll"><table class="box-score"><thead><tr><th class="wt">Wt</th><th>'+esc(oa.name)+'</th><th class="pts">Pts</th><th>'+esc(ob.name)+'</th><th class="pts">Pts</th></tr></thead><tbody>';
+    WEIGHTS.forEach(function(w){
+      var wa = activeWrestler(state, dm.week, dm.a, w);
+      var wb = activeWrestler(state, dm.week, dm.b, w);
+      var ra = resultFor(state, dm.week, dm.a, w);
+      var rb = resultFor(state, dm.week, dm.b, w);
+      var pa = pointsFor(state, dm.week, dm.a, w);
+      var pb = pointsFor(state, dm.week, dm.b, w);
+      var aLabel = wa ? esc(wa.name)+' <span style="color:var(--muted)">('+esc(outcomeShort(ra&&ra.outcome))+')</span>' : '<span class="empty-slot">—</span>';
+      var bLabel = wb ? esc(wb.name)+' <span style="color:var(--muted)">('+esc(outcomeShort(rb&&rb.outcome))+')</span>' : '<span class="empty-slot">—</span>';
+      html += '<tr><td class="wt">'+w+'</td><td>'+aLabel+'</td><td class="pts">'+pa+'</td><td>'+bLabel+'</td><td class="pts">'+pb+'</td></tr>';
+    });
+    html += '</tbody><tfoot><tr><td class="wt"></td><td>Total</td><td class="pts">'+sa.toFixed(0)+'</td><td>Total</td><td class="pts">'+sb.toFixed(0)+'</td></tr></tfoot></table></div>';
+
+    html += '<div class="box-totals">';
+    html += '<div class="box-total" style="border-left:4px solid '+oa.border+'"><span class="owner-chip"><span class="avatar" style="'+ownerStyle(oa)+'">'+esc(initials(oa.name))+'</span>'+esc(oa.name)+'</span><b>'+sa.toFixed(0)+'</b></div>';
+    html += '<div class="box-total" style="border-left:4px solid '+ob.border+'"><span class="owner-chip"><span class="avatar" style="'+ownerStyle(ob)+'">'+esc(initials(ob.name))+'</span>'+esc(ob.name)+'</span><b>'+sb.toFixed(0)+'</b></div>';
+    html += '</div>';
+    html += '<p class="sub" style="margin:14px 0 0;">Press Esc or click outside to close.</p>';
+    html += '</div></div>';
+    return html;
+  }
+
+  function renderRosters(){
+    var html = '<div class="card"><h2>Rosters</h2><p class="sub">Starter and bench wrestler at each weight class, by owner.</p>';
+    html += '<div class="filter-bar"><div class="field"><label for="roster-filter">Show owner</label><select id="roster-filter">';
+    html += '<option value="all"'+(rosterOwnerId==='all'?' selected':'')+'>All owners</option>';
+    state.owners.forEach(function(o){
+      html += '<option value="'+o.id+'"'+(o.id===rosterOwnerId?' selected':'')+'>'+esc(o.name)+'</option>';
+    });
+    html += '</select></div></div>';
+
+    if (state.wrestlers.length === 0) {
+      html += '<div class="empty-state"><strong>Draft board is empty</strong>No wrestlers have been entered yet. The organizer can fill starter and bench slots for each weight in the Organizer tab.</div></div>';
+      return html;
+    }
+
+    var owners = rosterOwnerId==='all' ? state.owners : state.owners.filter(function(o){ return o.id===rosterOwnerId; });
+    html += '<div class="owner-grid">';
+    owners.forEach(function(o){
+      html += '<div class="owner-card"><div class="owner-card-head" style="'+ownerStyle(o)+'"><span class="avatar" style="background:rgba(0,0,0,.12);color:inherit;">'+esc(initials(o.name))+'</span>'+esc(o.name)+'</div>';
+      WEIGHTS.forEach(function(w){
+        var starter = findWrestler(state,o.id,w,'starter');
+        var bench = findWrestler(state,o.id,w,'bench');
+        html += '<div class="roster-row"><span class="wt-badge">'+w+'</span>'+
+          '<div><span class="roster-slot-label">Starter</span>'+(starter? esc(starter.name)+' <span style="color:var(--muted)">('+esc(starter.school)+')</span>' : '<span class="empty-slot">not drafted</span>')+'</div>'+
+          '<div><span class="roster-slot-label">Bench</span>'+(bench? esc(bench.name)+' <span style="color:var(--muted)">('+esc(bench.school)+')</span>' : '<span class="empty-slot">not drafted</span>')+'</div>'+
+          '</div>';
+      });
+      html += '</div>';
+    });
+    html += '</div></div>';
+    return html;
+  }
+
+  function ownerOptions(selectedId){
+    return state.owners.map(function(o){ return '<option value="'+o.id+'"'+(o.id===selectedId?' selected':'')+'>'+esc(o.name)+'</option>'; }).join('');
+  }
+  function weekOptions(selectedWeek){
+    return state.schedule.map(function(wk){ return '<option value="'+wk.week+'"'+(wk.week===selectedWeek?' selected':'')+'>Week '+wk.week+' — '+esc(wk.label)+'</option>'; }).join('');
+  }
+  function outcomeOptions(current){
+    return ['no-match'].concat(OUTCOME_ORDER.filter(function(o){return o!=='no-match';})).map(function(o){
+      return '<option value="'+o+'"'+(current&&current.outcome===o?' selected':(!current&&o==='no-match'?' selected':''))+'>'+OUTCOME_LABELS[o]+'</option>';
+    }).join('');
+  }
+
+  function renderAdmin(){
+    if (!canEdit){
+      return '<div class="card"><h2>Organizer</h2><div class="notice">You need edit access on this artifact to enter rosters, lineups, or results.</div></div>';
+    }
+    var html = '<div class="card"><h2>Organizer Tools</h2><p class="sub">Enter draft rosters, set weekly lineups, and log official results'+(usingLocalStorage?' (saving to this browser)':'. Every save publishes a new version everyone sees')+'.</p>';
+
+    // Roster editor
+    html += '<div class="admin-editor"><h3 style="margin:0 0 10px;font-family:\'Big Shoulders Display\',sans-serif;text-transform:uppercase;">Roster Builder</h3>';
+    html += '<div class="field-row"><div class="field"><label>Owner</label><select id="roster-owner">'+ownerOptions(adminOwnerId)+'</select></div></div>';
+    html += '<div class="admin-grid" id="roster-fields">';
+    WEIGHTS.forEach(function(w){
+      var starter = findWrestler(state,adminOwnerId,w,'starter') || {name:'',school:''};
+      var bench = findWrestler(state,adminOwnerId,w,'bench') || {name:'',school:''};
+      html += '<div class="admin-wt-row"><span class="wt-label">'+w+'</span>'+
+        '<div class="field"><label>Starter — name / school</label><input type="text" id="st-name-'+w+'" placeholder="Wrestler name" value="'+esc(starter.name)+'" style="margin-bottom:6px;"><input type="text" id="st-school-'+w+'" placeholder="School" value="'+esc(starter.school)+'"></div>'+
+        '<div class="field"><label>Bench — name / school</label><input type="text" id="bn-name-'+w+'" placeholder="Wrestler name" value="'+esc(bench.name)+'" style="margin-bottom:6px;"><input type="text" id="bn-school-'+w+'" placeholder="School" value="'+esc(bench.school)+'"></div>'+
+        '</div>';
+    });
+    html += '</div><button class="btn" data-action="save-roster" style="margin-top:12px;" '+(saving?'disabled':'')+'>Save Roster</button></div>';
+
+    // Lineup editor
+    html += '<div class="admin-editor"><h3 style="margin:0 0 10px;font-family:\'Big Shoulders Display\',sans-serif;text-transform:uppercase;">Weekly Lineup</h3>';
+    html += '<div class="field-row"><div class="field"><label>Week</label><select id="lineup-week">'+weekOptions(adminWeek)+'</select></div><div class="field"><label>Owner</label><select id="lineup-owner">'+ownerOptions(adminOwnerId)+'</select></div></div>';
+    html += '<div id="lineup-fields">';
+    WEIGHTS.forEach(function(w){
+      var starter = findWrestler(state,adminOwnerId,w,'starter');
+      var bench = findWrestler(state,adminOwnerId,w,'bench');
+      var slot = activeSlot(state, adminWeek, adminOwnerId, w);
+      html += '<div class="lineup-row"><span class="wt-label">'+w+'</span>'+
+        '<span>'+(starter?esc(starter.name):'<span class="empty-slot">no starter</span>')+(bench?' / bench: '+esc(bench.name):'')+'</span>'+
+        '<div class="toggle-group" data-lineup-toggle="'+w+'">'+
+          '<button type="button" data-slot="starter" class="'+(slot==='starter'?'active':'')+'" '+(starter?'':'disabled')+'>Starter</button>'+
+          '<button type="button" data-slot="bench" class="'+(slot==='bench'?'active':'')+'" '+(bench?'':'disabled')+'>Bench</button>'+
+        '</div></div>';
+    });
+    html += '</div><button class="btn" data-action="save-lineup" style="margin-top:12px;" '+(saving?'disabled':'')+'>Save Lineup</button></div>';
+
+    // Matchup-oriented results editor
+    var wk = state.schedule.filter(function(w){ return w.week===adminWeek; })[0] || state.schedule[0];
+    if (adminMatchupIdx < 0 || adminMatchupIdx >= wk.matchups.length) adminMatchupIdx = 0;
+    var m = wk.matchups[adminMatchupIdx];
+    var oa = ownerById(state, m.a), ob = ownerById(state, m.b);
+
+    html += '<div class="admin-editor"><h3 style="margin:0 0 10px;font-family:\'Big Shoulders Display\',sans-serif;text-transform:uppercase;">Enter Results by Matchup</h3>';
+    html += '<div class="cheat-sheet" aria-label="Scoring cheat sheet">';
+    html += '<span>Dec 3</span><span>Major 4</span><span>Tech 5</span><span>Fall 6</span><span>Forfeit 6</span><span>Loss 0</span>';
+    html += '</div>';
+    html += '<div class="field-row"><div class="field"><label>Week</label><select id="results-week">'+weekOptions(adminWeek)+'</select></div>';
+    html += '<div class="field"><label>Matchup</label><select id="results-matchup">';
+    wk.matchups.forEach(function(mu, idx){
+      var a = ownerById(state, mu.a), b = ownerById(state, mu.b);
+      html += '<option value="'+idx+'"'+(idx===adminMatchupIdx?' selected':'')+'>'+esc(a.name)+' vs '+esc(b.name)+'</option>';
+    });
+    html += '</select></div></div>';
+
+    html += '<p class="sub" style="margin-bottom:10px;"><span class="owner-chip"><span class="avatar" style="'+ownerStyle(oa)+'">'+esc(initials(oa.name))+'</span>'+esc(oa.name)+'</span> &nbsp;vs&nbsp; <span class="owner-chip"><span class="avatar" style="'+ownerStyle(ob)+'">'+esc(initials(ob.name))+'</span>'+esc(ob.name)+'</span></p>';
+
+    html += '<div id="results-fields">';
+    html += '<div class="matchup-result-row" style="border-bottom:2px solid var(--line);font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:700;"><span></span><span>'+esc(oa.name)+'</span><span>Outcome</span><span>'+esc(ob.name)+'</span><span>Outcome</span></div>';
+    WEIGHTS.forEach(function(w){
+      var activeA = activeWrestler(state, adminWeek, m.a, w);
+      var activeB = activeWrestler(state, adminWeek, m.b, w);
+      var curA = resultFor(state, adminWeek, m.a, w);
+      var curB = resultFor(state, adminWeek, m.b, w);
+      html += '<div class="matchup-result-row">'+
+        '<span class="wt-label">'+w+'</span>'+
+        '<span class="side-a-name who">'+(activeA?esc(activeA.name)+' <span style="color:var(--muted)">('+activeSlot(state,adminWeek,m.a,w)+')</span>':'<span class="empty-slot">no active</span>')+'</span>'+
+        '<select class="side-a-sel" id="res-a-'+w+'" data-side="a" data-wt="'+w+'">'+outcomeOptions(curA)+'</select>'+
+        '<span class="side-b-name who">'+(activeB?esc(activeB.name)+' <span style="color:var(--muted)">('+activeSlot(state,adminWeek,m.b,w)+')</span>':'<span class="empty-slot">no active</span>')+'</span>'+
+        '<select class="side-b-sel" id="res-b-'+w+'" data-side="b" data-wt="'+w+'">'+outcomeOptions(curB)+'</select>'+
+        '</div>';
+    });
+    html += '</div>';
+    html += '<div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;align-items:center;">';
+    html += '<button class="btn" data-action="save-matchup-results" '+(saving?'disabled':'')+'>Save Matchup Results</button>';
+    html += '<span class="sub" style="margin:0;">Running total preview: <strong id="preview-a">'+weekScore(state,adminWeek,m.a).toFixed(0)+'</strong> – <strong id="preview-b">'+weekScore(state,adminWeek,m.b).toFixed(0)+'</strong></span>';
+    html += '</div></div>';
+
+    html += '</div>';
+    return html;
+  }
+
+  // ---------- events ----------
+  function wireEvents(){
+    root.querySelectorAll('[data-tab]').forEach(function(btn){
+      btn.addEventListener('click', function(){ tab = btn.getAttribute('data-tab'); saveUIPrefs(); render(); });
+    });
+    root.querySelectorAll('[data-week-view]').forEach(function(btn){
+      btn.addEventListener('click', function(){ viewWeek = parseInt(btn.getAttribute('data-week-view'),10); saveUIPrefs(); render(); });
+    });
+    root.querySelectorAll('[data-open-matchup]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        detailMatchup = {
+          week: parseInt(btn.getAttribute('data-open-matchup'),10),
+          a: btn.getAttribute('data-a'),
+          b: btn.getAttribute('data-b')
+        };
+        render();
+      });
+    });
+    var backdrop = root.querySelector('[data-modal-backdrop]');
+    if (backdrop) {
+      backdrop.addEventListener('click', function(e){
+        if (e.target === backdrop) closeDetail();
+      });
+      var closeBtn = backdrop.querySelector('[data-close-modal]');
+      if (closeBtn) closeBtn.addEventListener('click', closeDetail);
+      var dialog = backdrop.querySelector('.modal');
+      if (dialog) {
+        var focusable = dialog.querySelector('[data-close-modal]');
+        if (focusable) focusable.focus();
+      }
+    }
+
+    var rosterFilter = root.querySelector('#roster-filter');
+    if (rosterFilter) rosterFilter.addEventListener('change', function(){ rosterOwnerId = rosterFilter.value; saveUIPrefs(); render(); });
+
+    var rOwner = root.querySelector('#roster-owner');
+    if (rOwner) rOwner.addEventListener('change', function(){ adminOwnerId = rOwner.value; saveUIPrefs(); render(); });
+    var lWeek = root.querySelector('#lineup-week');
+    if (lWeek) lWeek.addEventListener('change', function(){ adminWeek = parseInt(lWeek.value,10); saveUIPrefs(); render(); });
+    var lOwner = root.querySelector('#lineup-owner');
+    if (lOwner) lOwner.addEventListener('change', function(){ adminOwnerId = lOwner.value; saveUIPrefs(); render(); });
+    var resWeek = root.querySelector('#results-week');
+    if (resWeek) resWeek.addEventListener('change', function(){ adminWeek = parseInt(resWeek.value,10); adminMatchupIdx = 0; saveUIPrefs(); render(); });
+    var resMatchup = root.querySelector('#results-matchup');
+    if (resMatchup) resMatchup.addEventListener('change', function(){ adminMatchupIdx = parseInt(resMatchup.value,10); saveUIPrefs(); render(); });
+
+    root.querySelectorAll('[data-lineup-toggle]').forEach(function(grp){
+      grp.querySelectorAll('button').forEach(function(b){
+        b.addEventListener('click', function(){
+          if (b.disabled) return;
+          grp.querySelectorAll('button').forEach(function(x){ x.classList.remove('active'); });
+          b.classList.add('active');
+          grp.setAttribute('data-chosen', b.getAttribute('data-slot'));
+        });
+      });
+    });
+
+    // Live preview totals for matchup results
+    function updatePreview(){
+      var pa = 0, pb = 0;
+      WEIGHTS.forEach(function(w){
+        var sa = root.querySelector('#res-a-'+w);
+        var sb = root.querySelector('#res-b-'+w);
+        if (sa) pa += POINTS[sa.value] || 0;
+        if (sb) pb += POINTS[sb.value] || 0;
+      });
+      var ea = root.querySelector('#preview-a');
+      var eb = root.querySelector('#preview-b');
+      if (ea) ea.textContent = String(pa);
+      if (eb) eb.textContent = String(pb);
+    }
+    root.querySelectorAll('#results-fields select').forEach(function(sel){
+      sel.addEventListener('change', updatePreview);
+    });
+
+    var saveRoster = root.querySelector('[data-action="save-roster"]');
+    if (saveRoster) saveRoster.addEventListener('click', function(){
+      var ns = cloneState();
+      var ownerId = root.querySelector('#roster-owner').value;
+      ns.wrestlers = ns.wrestlers.filter(function(w){ return w.ownerId!==ownerId; });
+      WEIGHTS.forEach(function(w){
+        var sn = root.querySelector('#st-name-'+w).value.trim();
+        var ss = root.querySelector('#st-school-'+w).value.trim();
+        var bn = root.querySelector('#bn-name-'+w).value.trim();
+        var bs = root.querySelector('#bn-school-'+w).value.trim();
+        if (sn) ns.wrestlers.push({ownerId:ownerId,weight:w,slot:'starter',name:sn,school:ss});
+        if (bn) ns.wrestlers.push({ownerId:ownerId,weight:w,slot:'bench',name:bn,school:bs});
+      });
+      adminOwnerId = ownerId;
+      saveUIPrefs();
+      publish(ns);
+    });
+
+    var saveLineup = root.querySelector('[data-action="save-lineup"]');
+    if (saveLineup) saveLineup.addEventListener('click', function(){
+      var ns = cloneState();
+      var week = parseInt(root.querySelector('#lineup-week').value,10);
+      var ownerId = root.querySelector('#lineup-owner').value;
+      var key = week+'_'+ownerId;
+      var choices = {};
+      root.querySelectorAll('[data-lineup-toggle]').forEach(function(grp){
+        var w = parseInt(grp.getAttribute('data-lineup-toggle'),10);
+        var chosen = grp.getAttribute('data-chosen') || (grp.querySelector('button.active')&&grp.querySelector('button.active').getAttribute('data-slot')) || 'starter';
+        choices[w] = chosen;
+      });
+      ns.lineups[key] = choices;
+      adminWeek = week; adminOwnerId = ownerId;
+      saveUIPrefs();
+      publish(ns);
+    });
+
+    var saveMatchupResults = root.querySelector('[data-action="save-matchup-results"]');
+    if (saveMatchupResults) saveMatchupResults.addEventListener('click', function(){
+      var ns = cloneState();
+      var week = parseInt(root.querySelector('#results-week').value,10);
+      var idx = parseInt(root.querySelector('#results-matchup').value,10);
+      var weekObj = ns.schedule.filter(function(w){ return w.week===week; })[0];
+      if (!weekObj || !weekObj.matchups[idx]) return;
+      var mu = weekObj.matchups[idx];
+      WEIGHTS.forEach(function(w){
+        var valA = root.querySelector('#res-a-'+w).value;
+        var valB = root.querySelector('#res-b-'+w).value;
+        var keyA = week+'_'+mu.a+'_'+w;
+        var keyB = week+'_'+mu.b+'_'+w;
+        if (valA==='no-match') delete ns.results[keyA];
+        else ns.results[keyA] = {outcome:valA};
+        if (valB==='no-match') delete ns.results[keyB];
+        else ns.results[keyB] = {outcome:valB};
+      });
+      adminWeek = week; adminMatchupIdx = idx;
+      saveUIPrefs();
+      publish(ns);
+    });
+  }
+
+  // Global Escape to close modal
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && detailMatchup) {
+      e.preventDefault();
+      closeDetail();
+    }
+  });
+
+  // ---------- boot ----------
+  injectStyle();
+  (async function(){
+    try {
+      if (typeof claude !== 'undefined' && claude && typeof claude.use === 'function') {
+        var userCap = await claude.use('user');
+        canEdit = userCap ? await userCap.canEdit() : false;
+        usingLocalStorage = false;
+      } else {
+        // Local file / no Claude: enable organizer via localStorage
+        canEdit = true;
+        usingLocalStorage = true;
+      }
+    } catch(e){
+      canEdit = true;
+      usingLocalStorage = true;
+    }
+    if (tab === 'admin' && !canEdit){ tab = 'standings'; saveUIPrefs(); }
+    render();
+  })();
+  render();
+}
+
+var SEASON_OWNERS = [
+  {id:'scott', name:'Scott', bg:'#f6d365', bg2:'#f9e7a1', text:'#2b1a00', border:'#c79412'},
+  {id:'drew', name:'Drew', bg:'#ffb4a2', bg2:'#ffd0c6', text:'#3f140a', border:'#d16e58'},
+  {id:'jake', name:'Jake', bg:'#9ad0f5', bg2:'#c0e6ff', text:'#08253b', border:'#4b8fc0'},
+  {id:'carter', name:'Carter', bg:'#a9f0d1', bg2:'#c8f7e3', text:'#0a2a1c', border:'#4da980'},
+  {id:'sam', name:'Sam', bg:'#d5b6ff', bg2:'#ead6ff', text:'#2b1146', border:'#8a63c2'},
+  {id:'troy', name:'Troy', bg:'#ffc78f', bg2:'#ffdeb8', text:'#402000', border:'#d48b33'},
+  {id:'pete', name:'Pete', bg:'#9ee8e0', bg2:'#c6f5f0', text:'#062d2a', border:'#39a8a0'},
+  {id:'joel', name:'Joel', bg:'#cde97d', bg2:'#e1f2ad', text:'#223100', border:'#91ab2b'},
+  {id:'dillon', name:'Dillon', bg:'#f7b2d0', bg2:'#ffd1e4', text:'#3b1023', border:'#c56896'},
+  {id:'zach', name:'Zach', bg:'#b8c7ff', bg2:'#d6deff', text:'#1b2344', border:'#6f86d7'},
+  {id:'jeremy', name:'Jeremy', bg:'#e9d7a5', bg2:'#f5ead1', text:'#352811', border:'#b89b4c'},
+  {id:'andrew', name:'Andrew', bg:'#ffd6a5', bg2:'#ffe7c9', text:'#3a2100', border:'#d29a47'}
+];
+
+var SEASON_SCHEDULE = [
+  {week:1, label:'Nov 16–22', matchups:[{a:'scott',b:'andrew'},{a:'drew',b:'jeremy'},{a:'jake',b:'zach'},{a:'carter',b:'dillon'},{a:'sam',b:'joel'},{a:'troy',b:'pete'}]},
+  {week:2, label:'Nov 23–29', matchups:[{a:'scott',b:'jeremy'},{a:'andrew',b:'zach'},{a:'drew',b:'dillon'},{a:'jake',b:'joel'},{a:'carter',b:'pete'},{a:'sam',b:'troy'}]},
+  {week:3, label:'Nov 30–Dec 6', matchups:[{a:'scott',b:'zach'},{a:'jeremy',b:'dillon'},{a:'andrew',b:'joel'},{a:'drew',b:'pete'},{a:'jake',b:'troy'},{a:'carter',b:'sam'}]},
+  {week:4, label:'Dec 7–13', matchups:[{a:'scott',b:'dillon'},{a:'zach',b:'joel'},{a:'jeremy',b:'pete'},{a:'andrew',b:'troy'},{a:'drew',b:'sam'},{a:'jake',b:'carter'}]},
+  {week:5, label:'Dec 14–20', matchups:[{a:'scott',b:'joel'},{a:'dillon',b:'pete'},{a:'zach',b:'troy'},{a:'jeremy',b:'sam'},{a:'andrew',b:'carter'},{a:'drew',b:'jake'}]},
+  {week:6, label:'Dec 21–27', matchups:[{a:'scott',b:'pete'},{a:'joel',b:'troy'},{a:'dillon',b:'sam'},{a:'zach',b:'carter'},{a:'jeremy',b:'jake'},{a:'andrew',b:'drew'}]},
+  {week:7, label:'Dec 28–Jan 3', matchups:[{a:'scott',b:'troy'},{a:'pete',b:'sam'},{a:'joel',b:'carter'},{a:'dillon',b:'jake'},{a:'zach',b:'drew'},{a:'jeremy',b:'andrew'}]},
+  {week:8, label:'Jan 4–10', matchups:[{a:'scott',b:'sam'},{a:'troy',b:'carter'},{a:'pete',b:'jake'},{a:'joel',b:'drew'},{a:'dillon',b:'andrew'},{a:'zach',b:'jeremy'}]},
+  {week:9, label:'Jan 11–17', matchups:[{a:'scott',b:'carter'},{a:'sam',b:'jake'},{a:'troy',b:'drew'},{a:'pete',b:'andrew'},{a:'joel',b:'jeremy'},{a:'dillon',b:'zach'}]},
+  {week:10, label:'Jan 18–24', matchups:[{a:'scott',b:'jake'},{a:'carter',b:'drew'},{a:'sam',b:'andrew'},{a:'troy',b:'jeremy'},{a:'pete',b:'zach'},{a:'joel',b:'dillon'}]},
+  {week:11, label:'Jan 25–31', matchups:[{a:'scott',b:'drew'},{a:'jake',b:'andrew'},{a:'carter',b:'jeremy'},{a:'sam',b:'zach'},{a:'troy',b:'dillon'},{a:'pete',b:'joel'}]}
+];
+
+var INITIAL_STATE = {
+  seasonLabel: '2026–27 Season',
+  owners: SEASON_OWNERS,
+  schedule: SEASON_SCHEDULE,
+  wrestlers: [],
+  lineups: {},
+  results: {}
+};
+
+appMain(INITIAL_STATE);
+</script>
+
+</body></html>
